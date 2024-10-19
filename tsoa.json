@@ -1,0 +1,21 @@
+{
+    "entryFile": "src/index.ts",
+    "noImplicitAdditionalProperties": "throw-on-extras",
+    "controllerPathGlobs": [
+        "src/services/**/controller/index.ts"
+    ],
+    "spec": {
+        "outputDirectory": "public",
+        "specVersion": 3,
+        "tags": [
+            {
+                "name": "CurrencyExchange",
+                "description": "Currency Exchange Service",
+                "externalDocs": {
+                    "description": "Find out more here on official currency exchange docs.",
+                    "url": "https://www.amdoren.com/currency-api/"
+                }
+            }
+        ]
+    }
+}
