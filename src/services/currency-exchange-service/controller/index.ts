@@ -1,5 +1,5 @@
-import { Request, Response } from "express";
 import { Route, Get, Tags, Query } from "tsoa";
+import CurrencyProvider, { CurrencyProviderResponse } from "../api-providers/provider.interface";
 
 interface DefaultResponse<T> {
     status: number;
@@ -9,9 +9,16 @@ interface DefaultResponse<T> {
 
 @Route("/api/currency")
 export default class CurrencyController {
+
+    public provider: CurrencyProvider;
+
+    constructor(provider: CurrencyProvider) {
+        this.provider = provider;
+    }
+
     @Tags('CurrencyExchange')
     @Get("/")
-    static async Get(): Promise<DefaultResponse<string>> {
+    public async Get(): Promise<DefaultResponse<string>> {
         return {
             status: 200,
             data: "Hello World from controller"
@@ -20,7 +27,7 @@ export default class CurrencyController {
 
     @Tags('CurrencyExchange')
     @Get("/getCurrency")
-    static async GetCurrency(@Query() from: string, @Query() to: string, @Query() amount?: string): Promise<DefaultResponse<string>> {
+    public async GetCurrency(@Query() from: string, @Query() to: string, @Query() amount?: string): Promise<DefaultResponse<CurrencyProviderResponse>> {
 
         if (!from) {
             return {
@@ -34,9 +41,19 @@ export default class CurrencyController {
                 message: "Missing to query parameter",
             }
         }
+
+        const response = await this.provider.getCurrency(from, to, amount);
+
+        if (response instanceof Error) {
+            return {
+                status: 400,
+                message: `Error solicitando datos del proveedor ${response.message}`
+            }
+        }
+
         return {
             status: 200,
-            data: JSON.stringify({ from, to, amount })
+            data: response
         }
     }
 }
