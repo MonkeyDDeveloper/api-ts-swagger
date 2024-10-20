@@ -35,4 +35,4 @@ we take less than 100ms to retrieve the info to the user.
 
 
 #### Test it!
-You can see docs here! [www.monkeydeveloper.com/docs](https://www.monkeydeveloper.com/docs)
+You can see docs here! (/api/currency/getCurrency) [www.monkeydeveloper.com/docs](https://www.monkeydeveloper.com/docs)
