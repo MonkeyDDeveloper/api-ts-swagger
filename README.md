@@ -32,3 +32,7 @@ we take less than 100ms to retrieve the info to the user.
 2. Install dependencies with *npm install*
 3. Add the api key (token) in the .env file
 4. Run *docker compose up -d*
+
+
+#### Test it!
+You can see docs here! [www.monkeydeveloper.com/docs](www.monkeydeveloper.com/docs)
