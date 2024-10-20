@@ -1,5 +1,6 @@
 import { query, Router } from "express";
 import CurrencyController from "./controller";
+import { RedisCachingService } from "./api-providers";
 import { AmdorenProvider } from "./api-providers";
 import dotEnv from "dotenv"
 
@@ -8,7 +9,11 @@ dotEnv.config();
 const AMDOREN_BASE_URI = process.env.AMDOREN_BASE_URI || "";
 const AMDOREN_API_TOKEN = process.env.AMDOREN_API_TOKEN || "";
 
-const currencyController = new CurrencyController(new AmdorenProvider(AMDOREN_API_TOKEN, AMDOREN_BASE_URI));
+const currencyController =
+    new CurrencyController(
+        new AmdorenProvider(AMDOREN_API_TOKEN, AMDOREN_BASE_URI),
+        new RedisCachingService()
+    );
 
 const currencyRouter = Router();
 
