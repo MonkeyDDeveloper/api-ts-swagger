@@ -1,5 +1,6 @@
 import { Route, Get, Tags, Query } from "tsoa";
 import CurrencyProvider, { CurrencyProviderResponse } from "../api-providers/provider.interface";
+import CachingService from "../api-providers/caching.service.interface";
 
 interface DefaultResponse<T> {
     status: number;
@@ -11,9 +12,11 @@ interface DefaultResponse<T> {
 export default class CurrencyController {
 
     public provider: CurrencyProvider;
+    public cachingService: CachingService;
 
-    constructor(provider: CurrencyProvider) {
+    constructor(provider: CurrencyProvider, cachingService: CachingService) {
         this.provider = provider;
+        this.cachingService = cachingService;
     }
 
     @Tags('CurrencyExchange')
@@ -28,7 +31,6 @@ export default class CurrencyController {
     @Tags('CurrencyExchange')
     @Get("/getCurrency")
     public async GetCurrency(@Query() from: string, @Query() to: string, @Query() amount?: string): Promise<DefaultResponse<CurrencyProviderResponse>> {
-
         if (!from) {
             return {
                 status: 400,
@@ -42,6 +44,15 @@ export default class CurrencyController {
             }
         }
 
+        const cachedData = await this.cachingService.get(`${from}-${to}-${amount || 1}`);
+
+        if (cachedData) {
+            return {
+                status: 200,
+                data: cachedData
+            }
+        }
+
         const response = await this.provider.getCurrency(from, to, amount);
 
         if (response instanceof Error) {
@@ -51,9 +62,12 @@ export default class CurrencyController {
             }
         }
 
+        await this.cachingService.set(`${from}-${to}-${amount || 1}`, response);
+
         return {
             status: 200,
             data: response
         }
+
     }
 }
