@@ -25,6 +25,42 @@
 				],
 				"type": "object",
 				"additionalProperties": false
+			},
+			"CurrencyProviderResponse": {
+				"properties": {
+					"error": {
+						"type": "number",
+						"format": "double"
+					},
+					"error_message": {
+						"type": "string"
+					},
+					"amount": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"DefaultResponse_CurrencyProviderResponse_": {
+				"properties": {
+					"status": {
+						"type": "number",
+						"format": "double"
+					},
+					"message": {
+						"type": "string"
+					},
+					"data": {
+						"$ref": "#/components/schemas/CurrencyProviderResponse"
+					}
+				},
+				"required": [
+					"status"
+				],
+				"type": "object",
+				"additionalProperties": false
 			}
 		},
 		"securitySchemes": {}
@@ -69,7 +105,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/DefaultResponse_string_"
+									"$ref": "#/components/schemas/DefaultResponse_CurrencyProviderResponse_"
 								}
 							}
 						}
