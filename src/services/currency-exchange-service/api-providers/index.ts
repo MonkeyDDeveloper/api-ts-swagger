@@ -1,5 +1,7 @@
 import axios from "axios";
 import CurrencyProvider, { CurrencyProviderResponse } from "./provider.interface";
+import CachingService from "./caching.service.interface";
+import { createClient } from "redis";
 
 const client = axios.create();
 
@@ -28,6 +30,58 @@ class AmdorenProvider implements CurrencyProvider {
     }
 }
 
+class RedisCachingService implements CachingService {
+
+    private redisClient?: ReturnType<typeof createClient>;
+
+    constructor() {
+        this.connect()
+    }
+
+    async connect(): Promise<void> {
+        try {
+            this.redisClient = await createClient({
+                socket: {
+                    host: process.env.REDIS_HOST,
+                    port: parseInt(process.env.REDIS_PORT || "6379")
+                }
+            })
+                .on("error", () => {
+                    console.log("Error connecting to redis");
+                })
+                .connect();
+        }
+        catch (err) {
+            console.log(`Error initializing redis caching service ${err}`);
+        }
+    }
+
+    async get<T>(key: string): Promise<T | null> {
+        try {
+            const data = await this.redisClient?.get(key);
+            if (data) {
+                return JSON.parse(data) as T;
+            }
+            return null;
+        }
+        catch (err) {
+            console.log(`Error getting data from redis ${err}`);
+            return null
+        }
+    }
+
+    async set(key: string, value: any, ttl?: number): Promise<void> {
+        try {
+            await this.redisClient?.set(key, JSON.stringify(value), { EX: ttl || 60 * 60 });
+        }
+        catch (err) {
+            console.log(`Error setting data to redis ${err}`);
+        }
+    }
+
+}
+
 export {
-    AmdorenProvider
+    AmdorenProvider,
+    RedisCachingService
 }
