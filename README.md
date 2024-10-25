@@ -31,4 +31,8 @@ we take less than 100ms to retrieve the info to the user.
 1. Clone the project
 2. Install dependencies with *npm install*
 3. Add the api key (token) in the .env file
-4. Run *docker compose up -d"
+4. Run *docker compose up -d*
+
+
+#### Test it!
+You can see docs here! (/api/currency/getCurrency) [www.monkeydeveloper.com/docs](https://www.monkeydeveloper.com/docs)
