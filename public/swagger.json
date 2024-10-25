@@ -20,9 +20,6 @@
 						"type": "string"
 					}
 				},
-				"required": [
-					"status"
-				],
 				"type": "object",
 				"additionalProperties": false
 			},
@@ -56,9 +53,6 @@
 						"$ref": "#/components/schemas/CurrencyProviderResponse"
 					}
 				},
-				"required": [
-					"status"
-				],
 				"type": "object",
 				"additionalProperties": false
 			}
@@ -74,7 +68,7 @@
 		"contact": {}
 	},
 	"paths": {
-		"/api/currency": {
+		"/api_currency": {
 			"get": {
 				"operationId": "Get",
 				"responses": {
@@ -84,6 +78,30 @@
 							"application/json": {
 								"schema": {
 									"$ref": "#/components/schemas/DefaultResponse_string_"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"data": "string"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/DefaultResponse_string_"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"message": "string"
+										}
+									}
 								}
 							}
 						}
@@ -96,7 +114,7 @@
 				"parameters": []
 			}
 		},
-		"/api/currency/getCurrency": {
+		"/api_currency/getCurrency": {
 			"get": {
 				"operationId": "GetCurrency",
 				"responses": {

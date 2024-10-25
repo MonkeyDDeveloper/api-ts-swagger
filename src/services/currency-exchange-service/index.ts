@@ -1,7 +1,7 @@
 import { query, Router } from "express";
 import CurrencyController from "./controller";
-import { RedisCachingService } from "./api-providers";
-import { AmdorenProvider } from "./api-providers";
+import { RedisCachingService } from "./controller-services";
+import { AmdorenProvider } from "./controller-services";
 import dotEnv from "dotenv"
 
 dotEnv.config();
@@ -17,12 +17,20 @@ const currencyController =
 
 const currencyRouter = Router();
 
-currencyRouter.get("/", async (_req, res) => {
-    const message = currencyController.Get();
-    res.send(message);
+currencyRouter.get("/", (req, res) => {
+    try {
+        const response = currencyController.Get()
+        res.status(200).json(response)
+    }
+    catch(err) {
+        res.status(500).json({
+            message: (err as Error).message
+        })
+    }
 });
 
-currencyRouter.get("/getCurrency", async (req, res) => {
+
+currencyRouter.get("/get_currency", async (req, res) => {
     const from = typeof req.query.from === "string" ? req.query.from : "";
     const to = typeof req.query.to === "string" ? req.query.to : "";
     const amount = typeof req.query.amount === "string" ? req.query.amount : "";

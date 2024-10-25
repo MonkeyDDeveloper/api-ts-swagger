@@ -43,11 +43,14 @@ class RedisCachingService implements CachingService {
             this.redisClient = await createClient({
                 socket: {
                     host: process.env.REDIS_HOST,
-                    port: parseInt(process.env.REDIS_PORT || "6379")
-                }
+                    port: parseInt(process.env.REDIS_PORT || "6379"),
+                },
+                password: process.env.REDIS_PASSWORD,
+                username: process.env.REDIS_USER,
             })
-                .on("error", () => {
+                .on("error", (err) => {
                     console.log("Error connecting to redis");
+                    console.log({err})
                 })
                 .connect();
         }

@@ -1,6 +1,6 @@
 import CurrencyController from "..";
-import CachingServide from "../../api-providers/caching.service.interface";
-import CurrencyProvider from "../../api-providers/provider.interface";
+import CachingServide from "../../controller-services/caching.service.interface";
+import CurrencyProvider from "../../controller-services/provider.interface";
 
 describe("Currency controller", () => {
 

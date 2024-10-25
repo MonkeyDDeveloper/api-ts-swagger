@@ -6,21 +6,21 @@ import swaggerUi from "swagger-ui-express";
 
 dotEnv.config();
 
-const PORT = process.env.EXPRESS_PORT || 3000;
+const PORT = process.env.EXPRESS_PORT || 1234;
 
 const app = express();
 
 app.use(json());
 app.use(responseTime());
-app.use('/api/currency', services.currencyRouter)
-app.use('/public', express.static("public"));
+app.use('/api_currency', services.currencyRouter)
+app.use('/public_currency', express.static("public"));
 
 app.use(
     "/docs",
     swaggerUi.serve,
     swaggerUi.setup(undefined, {
         swaggerOptions: {
-            url: "/public/swagger.json",
+            url: "/public_currency/swagger.json",
         },
     })
 );

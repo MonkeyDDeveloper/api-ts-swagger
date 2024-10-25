@@ -1,6 +1,6 @@
-import { Route, Get, Tags, Query } from "tsoa";
-import CurrencyProvider, { CurrencyProviderResponse } from "../api-providers/provider.interface";
-import CachingService from "../api-providers/caching.service.interface";
+import { Route, Get, Tags, Query, Example, Response,  } from "tsoa";
+import CurrencyProvider, { CurrencyProviderResponse } from "../controller-services/provider.interface";
+import CachingService from "../controller-services/caching.service.interface";
 
 interface DefaultResponse<T> {
     status: number;
@@ -8,7 +8,7 @@ interface DefaultResponse<T> {
     data?: T
 }
 
-@Route("/api/currency")
+@Route("api_currency")
 export default class CurrencyController {
 
     public provider: CurrencyProvider;
@@ -21,7 +21,10 @@ export default class CurrencyController {
 
     @Tags('CurrencyExchange')
     @Get("/")
-    public async Get(): Promise<DefaultResponse<string>> {
+    @Example<Omit<DefaultResponse<string>, 'status'>>({
+        data: "string"
+    })
+    public Get(): DefaultResponse<string> {
         return {
             status: 200,
             data: "Hello World from controller"
@@ -29,8 +32,25 @@ export default class CurrencyController {
     }
 
     @Tags('CurrencyExchange')
-    @Get("/getCurrency")
-    public async GetCurrency(@Query() from: string, @Query() to: string, @Query() amount?: string): Promise<DefaultResponse<CurrencyProviderResponse>> {
+    @Get("/get_currency")
+    @Example<Omit<DefaultResponse<CurrencyProviderResponse>, 'status'>>({
+        data: {
+            amount: 10,
+            error: 0,
+            error_message: "string"
+        }
+    })
+    @Response<Omit<DefaultResponse<string>, 'status'>>("400", "Bad Request", {
+        message: "string"
+    })
+    @Response<Omit<DefaultResponse<string>, 'status'>>("500", "Internal Server Error", {
+        message: "string"
+    })
+    public async GetCurrency(
+        @Query() from: string, 
+        @Query() to: string, 
+        @Query() amount?: string): Promise<DefaultResponse<CurrencyProviderResponse>> {
+
         if (!from) {
             return {
                 status: 400,
@@ -44,25 +64,34 @@ export default class CurrencyController {
             }
         }
 
-        const cachedData = await this.cachingService.get(`${from}-${to}-${amount || 1}`);
-
-        if (cachedData) {
-            return {
-                status: 200,
-                data: cachedData
+        try {
+            const cachedData = await this.cachingService.get(`${from}-${to}-${amount || 1}`);
+            if (cachedData) {
+                return {
+                    status: 200,
+                    data: cachedData
+                }
             }
+        }
+        catch(err) {
+            console.error(`Error obtaining data from caching service ${(err as Error).message}`)
         }
 
         const response = await this.provider.getCurrency(from, to, amount);
 
         if (response instanceof Error) {
             return {
-                status: 400,
+                status: 500,
                 message: `Error solicitando datos del proveedor ${response.message}`
             }
         }
 
-        await this.cachingService.set(`${from}-${to}-${amount || 1}`, response);
+        try {
+            await this.cachingService.set(`${from}-${to}-${amount || 1}`, response);
+        }
+        catch(err) {
+            console.error(`Error saving data on caching service ${(err as Error).message}`)
+        }
 
         return {
             status: 200,
